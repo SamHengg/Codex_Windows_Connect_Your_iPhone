@@ -8,19 +8,15 @@ https://github.com/SamHengg/Codex_Windows_Connect_Your_iPhone
 
 超详细教程即原理见仓库：Codex_Windows_Connect_Your_iPhone.md
 
-接下来是配置介绍正文部分~~
-
-Make Codex Desktop on Windows reliably connect to Codex / ChatGPT on iPhone.
-
-把 Windows 电脑端 Codex 配好，让 iPhone 端可以稳定发现、连接并同步电脑任务。
+> 直接把这个仓库发给 Codex，然后说：
+>
+> `请按照这个仓库配置我的 Windows 电脑端 Codex，让 iPhone 可以稳定连接。运行 setup.ps1，验证 status=connected，不要打印任何 token。`
 
 > Give this repository to Codex and say:
 >
 > `Follow this repo and configure my Windows Codex Desktop so my iPhone can connect reliably. Run setup.ps1, verify status=connected, and do not print any tokens.`
 >
-> 直接把这个仓库发给 Codex，然后说：
->
-> `请按照这个仓库配置我的 Windows 电脑端 Codex，让 iPhone 可以稳定连接。运行 setup.ps1，验证 status=connected，不要打印任何 token。`
+
 
 ## What This Fixes
 
