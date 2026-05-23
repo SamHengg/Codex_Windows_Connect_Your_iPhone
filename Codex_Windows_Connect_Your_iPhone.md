@@ -31,6 +31,26 @@
 4. 在 Windows 上使用一个 Node.js 保活脚本启动 `codex app-server`，主动调用 `remoteControl/enable`。
 5. 通过日志确认状态从 `disabled` 到 `connecting`，最终变为 `connected`。
 
+### 前置要求：需要安装 Codex CLI 吗？
+
+需要。本仓库脚本会调用 `codex app-server`，所以电脑上必须有 `codex` 命令。这里说的是 **Codex CLI**，不是 CML。
+
+你需要准备：
+
+1. **Codex Desktop**：先打开一次并登录，确保生成 `C:\Users\<你的用户名>\.codex\config.toml`。
+2. **Node.js LTS / npm**：用于安装 Codex CLI。
+3. **Codex CLI**：提供 `codex app-server` 命令，本仓库的保活脚本依赖它。
+4. **Git for Windows**：建议安装；缺少 Git 时，Codex Desktop 可能无法识别工作区元数据。
+
+安装 Codex CLI：
+
+```powershell
+npm install -g @openai/codex --registry=https://registry.npmmirror.com
+codex --version
+```
+
+如果 `codex --version` 能输出版本号，再运行本仓库的 `setup.ps1`。
+
 ### 原理
 
 Codex Desktop 的手机连接依赖远程控制功能。配置文件中的两个开关很关键：
@@ -593,6 +613,26 @@ Common blockers:
    remoteControl/status/read
    remoteControl/enable
    ```
+
+### Prerequisites: Is Codex CLI Required?
+
+Yes. This repository requires Codex CLI because the helper scripts call `codex app-server`. If someone says "Codex CML", they usually mean **Codex CLI**.
+
+Prepare these first:
+
+1. **Codex Desktop**: open it once and sign in, so `C:\Users\<your username>\.codex\config.toml` exists.
+2. **Node.js LTS / npm**: required to install Codex CLI.
+3. **Codex CLI**: provides the `codex app-server` command used by this repo.
+4. **Git for Windows**: recommended, because Codex Desktop may need it for workspace metadata.
+
+Install Codex CLI:
+
+```powershell
+npm install -g @openai/codex --registry=https://registry.npmmirror.com
+codex --version
+```
+
+After `codex --version` prints a version number, run this repository's `setup.ps1`.
 
 ### One-Shot Prompt for Codex
 

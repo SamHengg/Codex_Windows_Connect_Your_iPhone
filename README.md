@@ -21,6 +21,19 @@ https://github.com/SamHengg/Codex_Windows_Connect_Your_iPhone
 >
 
 
+## Requirements
+
+Yes, this repo requires Codex CLI. The scripts call `codex app-server`, so Windows must have both Codex Desktop and the `codex` command available.
+
+中文说明：这里需要安装的是 **Codex CLI**，不是 CML。别人使用这个仓库前，请先安装 Node.js LTS，然后运行：
+
+```powershell
+npm install -g @openai/codex --registry=https://registry.npmmirror.com
+codex --version
+```
+
+Also open Codex Desktop once and sign in with the same OpenAI / ChatGPT account used on the phone. This creates `%USERPROFILE%\.codex\config.toml`, which `setup.ps1` will repair and configure.
+
 ## What This Fixes
 
 - iPhone says connected, but desktop and phone do not sync.

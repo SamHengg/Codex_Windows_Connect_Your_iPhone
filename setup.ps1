@@ -6,7 +6,7 @@ $BackupDir = Join-Path $CodexHome "backups"
 $LogDir = Join-Path $CodexHome "logs"
 
 if (-not (Test-Path $Config)) {
-    throw "Cannot find Codex config: $Config"
+    throw "Cannot find Codex config: $Config. Open Codex Desktop once, sign in, then rerun setup.ps1."
 }
 
 New-Item -ItemType Directory -Force -Path $BackupDir, $LogDir | Out-Null
@@ -39,10 +39,10 @@ Copy-Item -LiteralPath $JsSource -Destination $JsTarget -Force
 Copy-Item -LiteralPath $PsSource -Destination $PsTarget -Force
 
 if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
-    throw "Node.js is required. Install Node.js LTS, then rerun setup.ps1."
+    throw "Node.js LTS and npm are required. Install Node.js LTS, then rerun setup.ps1."
 }
 if (-not (Get-Command codex -ErrorAction SilentlyContinue)) {
-    throw "Codex CLI is required. Install with: npm install -g @openai/codex"
+    throw "Codex CLI is required because this setup calls 'codex app-server'. Install with: npm install -g @openai/codex --registry=https://registry.npmmirror.com"
 }
 
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
