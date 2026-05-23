@@ -9,6 +9,9 @@ https://github.com/SamHengg/Codex_Windows_Connect_Your_iPhone
 喂给Codex进行配置操作,大概率可以一遍成功，然后配置好手机端即可操作。
 手机端教程在文本末尾~
 
+若有问题，请随时与我联系：sunzh25@mails.tsinghua.edu.cn
+本项目已完全开源~可按需更新
+
 超详细教程即原理见仓库：Codex_Windows_Connect_Your_iPhone.md
 
 > 直接把这个仓库发给 Codex，然后说：
