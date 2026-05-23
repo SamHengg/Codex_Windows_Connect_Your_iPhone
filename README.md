@@ -34,6 +34,8 @@ Open PowerShell in this repository and run:
 powershell -NoProfile -ExecutionPolicy Bypass -File .\setup.ps1
 ```
 
+The setup also creates a Windows logon task named `Codex iPhone Remote Control Helper`, so the helper starts automatically after you sign in.
+
 Check status:
 
 ```powershell

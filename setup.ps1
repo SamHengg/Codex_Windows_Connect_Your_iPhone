@@ -49,7 +49,12 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
     Write-Warning "Git was not found in PATH. Install Git for Windows if Codex Desktop logs workspace metadata errors."
 }
 
+$TaskName = "Codex iPhone Remote Control Helper"
+$Action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PsTarget`" -Background"
+$Trigger = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
+$Settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1)
+Register-ScheduledTask -TaskName $TaskName -Action $Action -Trigger $Trigger -Settings $Settings -Description "Keeps Codex remote control connected for iPhone." -Force | Out-Null
+
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File $PsTarget -Background
 Start-Sleep -Seconds 10
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File $PsTarget -Status
-

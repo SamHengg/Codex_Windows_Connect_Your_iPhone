@@ -13,6 +13,8 @@ let buffer = "";
 let initialized = false;
 let requestCounter = 0;
 let stopping = false;
+let lastEnableAt = 0;
+let consecutiveErroredReads = 0;
 
 function log(message) {
   fs.appendFileSync(logFile, `[${new Date().toISOString()}] ${message}\n`, "utf8");
@@ -29,18 +31,48 @@ function readStatus(label) {
   send("remoteControl/status/read", null, label || `remote-status-${++requestCounter}`);
 }
 
+function maybeEnableRemote(status, reason) {
+  if (!status || !/^(disabled|errored|disconnected)$/i.test(status)) return;
+
+  const now = Date.now();
+  if (now - lastEnableAt < 15000) return;
+
+  lastEnableAt = now;
+  log(`[recover] enabling remote control reason=${reason} status=${status}`);
+  send("remoteControl/enable", null, `remote-enable-${++requestCounter}`);
+}
+
+function restartChild(reason) {
+  if (!child) return;
+  log(`[recover] restarting app-server reason=${reason}`);
+  consecutiveErroredReads = 0;
+  child.kill();
+}
+
 function handleMessage(obj) {
   if (obj.method === "remoteControl/status/changed" && obj.params) {
     const p = obj.params;
     log(`[remoteControl/status/changed] status=${p.status} server=${p.serverName || ""} environment=${p.environmentId || ""}`);
+    maybeEnableRemote(p.status, "status-changed");
     return;
   }
 
   if (obj.id) {
     const data = obj.result || obj.error || {};
     log(`[response] id=${obj.id} ${JSON.stringify(data)}`);
-    if (obj.id === "remote-status-before-enable" && /disabled/i.test(JSON.stringify(data))) {
-      send("remoteControl/enable", null, "remote-enable");
+
+    if (data && typeof data.status === "string") {
+      if (data.status === "errored") {
+        consecutiveErroredReads += 1;
+      } else {
+        consecutiveErroredReads = 0;
+      }
+
+      maybeEnableRemote(data.status, `response:${obj.id}`);
+
+      if (consecutiveErroredReads >= 4) {
+        restartChild("remote-control-stuck-errored");
+      }
     }
     return;
   }
@@ -115,4 +147,3 @@ setInterval(() => {
 
 log("[boot] remote control helper starting");
 start();
-
