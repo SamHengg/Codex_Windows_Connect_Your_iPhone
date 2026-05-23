@@ -6,6 +6,9 @@ https://github.com/SamHengg/Codex_Windows_Connect_Your_iPhone
 喂给Codex进行配置操作,大概率可以一遍成功，然后配置好手机端即可操作。
 手机端教程在文本末尾~
 
+超详细教程见仓库：Codex_Windows_Connect_Your_iPhone.md
+
+
 Make Codex Desktop on Windows reliably connect to Codex / ChatGPT on iPhone.
 
 把 Windows 电脑端 Codex 配好，让 iPhone 端可以稳定发现、连接并同步电脑任务。
