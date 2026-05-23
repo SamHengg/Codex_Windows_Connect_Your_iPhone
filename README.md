@@ -1,5 +1,8 @@
 # Codex Windows Connect Your iPhone
 
+便于方便可以直接将本仓库链接
+https://github.com/SamHengg/Codex_Windows_Connect_Your_iPhone 喂给Codex进行配置操作
+
 Make Codex Desktop on Windows reliably connect to Codex / ChatGPT on iPhone.
 
 把 Windows 电脑端 Codex 配好，让 iPhone 端可以稳定发现、连接并同步电脑任务。
