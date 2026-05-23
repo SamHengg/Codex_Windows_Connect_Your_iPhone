@@ -1,8 +1,8 @@
 # Codex Windows Connect Your iPhone
 最最最详细windows电脑Codex连接手机（安卓、苹果）Chatgpt软件控制教程！！！！
 已经过超多次试错和检验
-最终实现打开电脑端Codex手机端即可稳定连接，无需任何配置
-实现高效办公科研
+最终实现打开电脑端Codex手机端即可稳定连接，无需任何配置，
+实现高效办公科研~
 
 读者可直接将本仓库链接
 https://github.com/SamHengg/Codex_Windows_Connect_Your_iPhone 
