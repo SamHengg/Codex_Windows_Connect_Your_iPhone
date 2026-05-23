@@ -95,9 +95,16 @@ The helper keeps checking status and leaves a small log here:
 
 ## Files
 
+- `Codex_Windows_Connect_Your_iPhone.md`: full bilingual guide with principles, detailed steps, iPhone MFA setup, and troubleshooting. Give this file to Codex when you want the most complete guided setup.
 - `setup.ps1`: one-shot Windows setup.
 - `scripts/codex-remote-control-server.js`: app-server keepalive helper.
 - `scripts/codex-remote-control-server.ps1`: start / stop / status wrapper.
+
+中文说明：
+
+- `Codex_Windows_Connect_Your_iPhone.md`：完整中英文教程，包含原理、详细步骤、手机端 MFA 设置和排错。需要详细配置时，可以直接把这个文件喂给 Codex。
+- `setup.ps1`：一键配置入口。
+- `scripts/`：远程控制保活脚本和启动/停止/状态查看工具。
 
 ## Stop / Restart Helper
 
@@ -169,4 +176,3 @@ This project does not read, print, or modify `auth.json`, tokens, API keys, cook
 ## License
 
 MIT
-
