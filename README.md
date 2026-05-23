@@ -23,9 +23,9 @@ https://github.com/SamHengg/Codex_Windows_Connect_Your_iPhone
 
 ## Requirements
 
-Yes, this repo requires Codex CLI. The scripts call `codex app-server`, so Windows must have both Codex Desktop and the `codex` command available.
+ Windows must have both Codex Desktop and the `codex` command available.
 
-中文说明：这里需要安装的是 **Codex CLI**，不是 CML。别人使用这个仓库前，请先安装 Node.js LTS，然后运行：
+中文说明：使用这个仓库前，请先安装 Node.js LTS，然后运行：
 
 ```powershell
 npm install -g @openai/codex --registry=https://registry.npmmirror.com
