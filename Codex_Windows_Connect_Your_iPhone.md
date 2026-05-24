@@ -6,7 +6,7 @@
 >
 > 快速使用：把这个文件 `Codex_Windows_Connect_Your_iPhone.md` 直接发给 Codex，然后说：
 >
-> `请按照这个 Markdown 教程检查我的 Windows 电脑端 Codex 远程连接状态。先判断官方是否支持 Windows host，再执行安全诊断，不要打印 token。`
+> `请按照这个 Markdown 教程配置我的 Windows 电脑端 Codex，让 iPhone 可以连接。请检查 Codex Desktop、Codex CLI、config.toml、MFA、远程控制状态和红点离线问题，不要打印 token。`
 
 ---
 
@@ -14,7 +14,7 @@
 
 ### 先说结论
 
-截至 2026-05-24，OpenAI 官方发布说明中写明：ChatGPT 手机端的 Codex remote access 当前用于连接运行在 **macOS host** 上的 Codex。Windows 可以安装 Codex Desktop 和 Codex CLI，但 iPhone 稳定远程控制 Windows host 目前不属于官方稳定支持能力。
+截至 2026-05-24，OpenAI 官方发布说明偏向 Mac-first，但 Windows Codex Beta 用户已经有成功连接手机端的案例。Windows 端连接比 macOS 更容易遇到红点、离线、一直转圈、CLI connected 但手机端 offline 等问题，所以需要同时检查 Codex Desktop、Codex CLI、账号安全、远程控制权限和本地配置。
 
 因此，如果你在 Windows 上看到：
 
@@ -22,7 +22,7 @@
 - 手机端仍显示红点、离线、重新连接失败；
 - `codex remote-control start` 报 `daemon lifecycle is only supported on Unix platforms`；
 
-这通常不是你配置错了，而是 Windows host 远程连接路径还没有官方完整支持。本文保留 Windows 排查记录和实验脚本，适合学习原理、定位问题、等待后续版本；如果你要稳定手机远程连接，请优先使用 macOS 版 Codex App。
+这不一定说明 Windows 不能连接，更常见的是版本、账号、MFA、远程权限、配置文件或 app-server 状态有一环没有对齐。本文按 Windows 端教程整理可执行检查步骤和实验性保活方案。
 
 官方参考：
 
@@ -31,7 +31,7 @@
 
 ### 目标
 
-本教程用于记录 Windows 电脑上配置 Codex Desktop 与 Codex CLI 远程连接时的排查过程。它可以帮助你理解为什么 Windows 端实验 app-server 可能显示 connected，但 iPhone 端仍然显示离线。
+本教程用于在 Windows 电脑上配置 Codex Desktop 与 Codex CLI，使 iPhone / Android ChatGPT App 里的 Codex 尽可能稳定发现、连接并同步电脑端任务。
 
 适用场景：
 
@@ -40,13 +40,13 @@
 - `config.toml` 已经写了 `remote_control = true`，但实际仍然无法连接。
 - Windows 上 `codex remote-control start` 或 `codex app-server daemon enable-remote-control` 报错。
 
-本教程的实验方案：
+本教程的核心方案：
 
 1. 确保 `~\.codex\config.toml` 里开启远程连接功能。
 2. 取消 `config.toml` 的只读状态，避免 Codex Desktop 无法写入配置。
 3. 安装并确认 `git` 在 PATH 中可用，避免 Codex Desktop 无法识别工作区元数据。
 4. 在 Windows 上使用一个 Node.js 保活脚本启动 `codex app-server`，主动调用 `remoteControl/enable`。
-5. 通过日志确认状态从 `disabled` 到 `connecting`，最终变为 `connected`，但这不等同于手机端一定可控制 Windows host。
+5. 通过日志确认状态从 `disabled` 到 `connecting`，最终变为 `connected`。
 
 ### 前置要求：需要安装 Codex CLI 吗？
 
@@ -514,6 +514,18 @@ codex doctor --summary
 
 重点看 `Connectivity` 和 `websocket` 是否正常。
 
+#### 手机端仍然红点 / 离线
+
+按这个顺序排查：
+
+1. 确认 Windows Codex Desktop / Codex Beta 和手机端 ChatGPT 都是最新版。
+2. 确认手机端和电脑端登录同一个 ChatGPT / OpenAI 账号。
+3. 确认 ChatGPT 设置里的 MFA 已开启，推荐 Authenticator app。
+4. 完全退出并重开电脑端 Codex Desktop，再强退并重开手机端 ChatGPT。
+5. 检查是否有多个旧的 app-server 或 helper 进程残留；如果有，停止后重新运行 `setup.ps1`。
+6. 查看 `%USERPROFILE%\.codex\logs\remote-control-server.log`，确认最近记录里有 `status=connected`。
+7. 如果手机端出现两个同名电脑，优先点新刷出来的那一个；必要时手机端退出登录再重新登录刷新设备列表。
+
 #### `duplicate key`
 
 检查 `config.toml` 是否有多个 `[features]` 表，或者同一个 key 写了多次。保留一个 `[features]` 表即可。
@@ -555,9 +567,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.codex\cod
 
 ### Current Status
 
-As of 2026-05-24, OpenAI's public release notes describe Codex mobile remote access as connecting the ChatGPT mobile app to Codex running on a **macOS host**. Windows can run Codex Desktop and Codex CLI, but reliable iPhone remote access to a Windows host is not currently documented as an officially supported stable path.
+As of 2026-05-24, OpenAI's public release notes describe Codex mobile remote access as Mac-first, but Windows Codex Beta users have reported successful mobile connections. Windows setup is more fragile than macOS and may require checking the desktop app, CLI, account security, remote-control permissions, and local config together.
 
-If Windows shows a local CLI app-server as `status=connected` while the phone still shows a red offline dot, that does not necessarily mean your setup is wrong. It usually means the experimental Windows app-server path is not being accepted by the mobile remote-access experience as a controllable host. For stable phone remote access, use the macOS Codex App.
+If Windows shows a local CLI app-server as `status=connected` while the phone still shows a red offline dot, check version, same-account login, MFA, remote-control permission, writable `config.toml`, and whether multiple stale app-server processes are competing.
 
 Official references:
 
@@ -566,7 +578,7 @@ Official references:
 
 ### Goal
 
-This guide documents the Windows troubleshooting path for Codex Desktop and Codex CLI remote-control experiments. It explains why Windows may report `status=connected` locally while the iPhone still shows the host as offline.
+This guide configures Codex Desktop and Codex CLI on Windows so the ChatGPT mobile app can discover and connect to the Windows host when the user's Windows Codex Beta supports mobile remote access.
 
 Use this when:
 
@@ -667,16 +679,16 @@ After `codex --version` prints a version number, run this repository's `setup.ps
 Paste this guide into Codex and use this prompt:
 
 ```text
-Please follow Codex_Windows_Connect_Your_iPhone.md and inspect my Windows Codex Desktop remote-connection status.
+Please follow Codex_Windows_Connect_Your_iPhone.md and configure my Windows Codex Desktop so my iPhone can connect.
 
 Requirements:
-1. First check whether Windows host remote access is officially supported by the current Codex/ChatGPT mobile release.
+1. Check that I am using the latest Windows Codex Desktop / Codex Beta and the latest ChatGPT mobile app.
 2. Check and repair C:\Users\<username>\.codex\config.toml.
 3. Ensure [features] contains remote_connections = true and remote_control = true.
 4. Ensure config.toml is writable; back it up before editing.
-5. Check whether git exists; if missing, install Git for Windows.
-6. If running any experimental Windows helper, clearly state that local status=connected may still show as offline on mobile.
-7. Prefer safe diagnostics over changing tokens or credentials.
+5. Check that phone and desktop use the same ChatGPT account and MFA is enabled.
+6. Check whether git exists; if missing, install Git for Windows.
+7. Diagnose red offline-dot issues, stale app-server processes, and remote-control status.
 8. Do not print auth.json, tokens, secrets, or login credentials.
 ```
 
