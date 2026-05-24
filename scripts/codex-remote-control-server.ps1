@@ -19,9 +19,35 @@ function Get-HelperProcess {
     try { return Get-Process -Id ([int]$PidText) -ErrorAction Stop } catch { return $null }
 }
 
+function Stop-ProcessTree {
+    param([int]$ProcessId)
+
+    $Children = Get-CimInstance Win32_Process -Filter "ParentProcessId=$ProcessId" -ErrorAction SilentlyContinue
+    foreach ($Child in $Children) {
+        Stop-ProcessTree -ProcessId $Child.ProcessId
+    }
+
+    Stop-Process -Id $ProcessId -Force -ErrorAction SilentlyContinue
+}
+
+function Stop-RemoteControlProcesses {
+    $CurrentPid = $PID
+    $Matches = Get-CimInstance Win32_Process |
+        Where-Object {
+            $_.ProcessId -ne $CurrentPid -and $_.CommandLine -and (
+                ($_.Name -eq "node.exe" -and $_.CommandLine -like "*codex-remote-control-server.js*") -or
+                ($_.Name -in @("cmd.exe", "node.exe", "codex.exe") -and $_.CommandLine -like "*app-server --listen stdio:// --enable remote_control*")
+            )
+        } |
+        Sort-Object ProcessId -Unique
+
+    foreach ($Match in $Matches) {
+        Stop-ProcessTree -ProcessId $Match.ProcessId
+    }
+}
+
 if ($Stop) {
-    $Proc = Get-HelperProcess
-    if ($Proc) { Stop-Process -Id $Proc.Id -Force }
+    Stop-RemoteControlProcesses
     Remove-Item -LiteralPath $PidFile -Force -ErrorAction SilentlyContinue
     "stopped"
     exit 0
@@ -36,11 +62,8 @@ if ($Status) {
 
 $Node = (Get-Command node -ErrorAction Stop).Source
 
-$Existing = Get-HelperProcess
-if ($Existing) {
-    Stop-Process -Id $Existing.Id -Force
-    Start-Sleep -Seconds 1
-}
+Stop-RemoteControlProcesses
+Start-Sleep -Seconds 1
 
 $Proc = Start-Process -FilePath $Node -ArgumentList @($JsFile) -WindowStyle Hidden -PassThru
 Set-Content -LiteralPath $PidFile -Value $Proc.Id -Encoding ASCII

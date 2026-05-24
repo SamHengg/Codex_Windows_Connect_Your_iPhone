@@ -14,6 +14,7 @@ let initialized = false;
 let requestCounter = 0;
 let stopping = false;
 let lastEnableAt = 0;
+let lastRefreshAt = 0;
 let consecutiveErroredReads = 0;
 
 function log(message) {
@@ -40,6 +41,17 @@ function maybeEnableRemote(status, reason) {
   lastEnableAt = now;
   log(`[recover] enabling remote control reason=${reason} status=${status}`);
   send("remoteControl/enable", null, `remote-enable-${++requestCounter}`);
+}
+
+function maybeRefreshConnected(status, reason) {
+  if (status !== "connected") return;
+
+  const now = Date.now();
+  if (now - lastRefreshAt < 120000) return;
+
+  lastRefreshAt = now;
+  log(`[refresh] re-enabling connected remote control reason=${reason}`);
+  send("remoteControl/enable", null, `remote-refresh-${++requestCounter}`);
 }
 
 function restartChild(reason) {
@@ -69,6 +81,7 @@ function handleMessage(obj) {
       }
 
       maybeEnableRemote(data.status, `response:${obj.id}`);
+      maybeRefreshConnected(data.status, `response:${obj.id}`);
 
       if (consecutiveErroredReads >= 4) {
         restartChild("remote-control-stuck-errored");
