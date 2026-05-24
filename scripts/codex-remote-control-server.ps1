@@ -36,12 +36,25 @@ if ($Status) {
 
 $Node = (Get-Command node -ErrorAction Stop).Source
 
+$Existing = Get-HelperProcess
+if ($Existing) {
+    Stop-Process -Id $Existing.Id -Force
+    Start-Sleep -Seconds 1
+}
+
+$Proc = Start-Process -FilePath $Node -ArgumentList @($JsFile) -WindowStyle Hidden -PassThru
+Set-Content -LiteralPath $PidFile -Value $Proc.Id -Encoding ASCII
+"started pid=$($Proc.Id) log=$LogFile"
+
 if ($Background) {
-    $Proc = Start-Process -FilePath $Node -ArgumentList @($JsFile) -WindowStyle Hidden -PassThru
-    Set-Content -LiteralPath $PidFile -Value $Proc.Id -Encoding ASCII
-    "started pid=$($Proc.Id) log=$LogFile"
     exit 0
 }
 
-& $Node $JsFile
-
+$Proc.WaitForExit()
+$Proc.Refresh()
+$SavedPid = if (Test-Path $PidFile) { (Get-Content -LiteralPath $PidFile -Raw).Trim() } else { "" }
+if ($SavedPid -eq [string]$Proc.Id) {
+    Remove-Item -LiteralPath $PidFile -Force -ErrorAction SilentlyContinue
+}
+if ($null -ne $Proc.ExitCode) { exit $Proc.ExitCode }
+exit 0

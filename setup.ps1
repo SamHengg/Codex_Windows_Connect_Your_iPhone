@@ -50,11 +50,12 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
 }
 
 $TaskName = "Codex iPhone Remote Control Helper"
-$Action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PsTarget`" -Background"
+$Action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PsTarget`""
 $Trigger = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
-$Settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1)
+$Settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -RestartCount 999 -RestartInterval (New-TimeSpan -Minutes 1) -ExecutionTimeLimit (New-TimeSpan -Days 30)
 Register-ScheduledTask -TaskName $TaskName -Action $Action -Trigger $Trigger -Settings $Settings -Description "Keeps Codex remote control connected for iPhone." -Force | Out-Null
 
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File $PsTarget -Background
+Stop-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
+Start-ScheduledTask -TaskName $TaskName
 Start-Sleep -Seconds 10
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File $PsTarget -Status
